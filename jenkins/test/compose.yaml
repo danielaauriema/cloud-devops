@@ -1,0 +1,29 @@
+services:
+  openldap:
+    image: ghcr.io/danielaauriema/openldap:latest
+    container_name: test-openldap
+    environment:
+      LDAP_DOMAIN: "jenkins.local"
+      LDAP_BASE_DN: "${LDAP_BASE_DN}"
+      LDAP_BIND_USERNAME: "bind"
+      LDAP_BIND_PASSWORD: "${LDAP_BIND_PASSWORD}"
+      LDAP_DEFAULT_USERNAME: "${LDAP_DEFAULT_USERNAME}"
+      LDAP_DEFAULT_PASSWORD: "${LDAP_DEFAULT_PASSWORD}"
+      LDAP_LOG_LEVEL: 255
+
+  jenkins:
+    build: ../docker
+    container_name: test-jenkins
+    depends_on:
+      - openldap
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../docker/jenkins.yaml:/var/jenkins_casc/jenkins.yaml
+    environment:
+      LDAP_SERVER: "${LDAP_SERVER}"
+      LDAP_BASE_DN: "${LDAP_BASE_DN}"
+      LDAP_BIND_DN: "cn=bind,${LDAP_BASE_DN}"
+      LDAP_BIND_PASSWORD: "${LDAP_BIND_PASSWORD}"
+
+#  curl -k -u jenkins:password http://localhost:8080/metrics/currentUser/ping

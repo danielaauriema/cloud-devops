@@ -1,0 +1,39 @@
+services:
+  openldap:
+    image: ghcr.io/danielaauriema/openldap:latest
+    container_name: test_openldap
+    environment:
+      LDAP_DOMAIN: "gitea.local"
+      LDAP_BASE_DN: "dc=gitea,dc=local"
+      LDAP_BIND_USERNAME: "bind"
+      LDAP_BIND_PASSWORD: "password"
+      LDAP_DEFAULT_USERNAME: "ldap"
+      LDAP_DEFAULT_PASSWORD: "password"
+
+  postgres:
+    image: postgres
+    container_name: test_postgres
+    environment:
+      POSTGRES_PASSWORD: password
+
+  gitea:
+    build: ../docker
+    container_name: test_gitea
+    ports:
+      - "3000:3000"
+    depends_on:
+      - openldap
+      - postgres
+    environment:
+    # database config
+      GITEA__database__DB_TYPE: "${GITEA__database__DB_TYPE}"
+      GITEA__database__HOST: "${GITEA__database__HOST}"
+      GITEA__database__NAME: "${GITEA__database__NAME}"
+      GITEA__database__USER: "${GITEA__database__USER}"
+      GITEA__database__PASSWD: "${GITEA__database__PASSWD}"
+      # LDAP config
+      LDAP__HOST: "${LDAP__HOST}"
+      LDAP__BASE_DN: "${LDAP__BASE_DN}"
+      LDAP__BIND_DN: "${LDAP__BIND_DN}"
+      LDAP__BIND_PASSWORD: "${LDAP__BIND_PASSWORD}"
+      LDAP__SEARCH_BASE: "${LDAP__SEARCH_BASE}"
