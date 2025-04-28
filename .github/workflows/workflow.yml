@@ -1,4 +1,4 @@
-name: Docker Tests
+name: Workflow
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -14,7 +14,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+
+  test:
 
     runs-on: ubuntu-latest
     permissions:
@@ -37,3 +38,29 @@ jobs:
       - name: Run Jenkins Tests
         run: make jenkins-test
         shell: bash
+
+  gitea:
+    needs: test
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    uses: danielaauriema/cloud-utils/.github/workflows/docker-publish.yml@main
+    with:
+      context: ./gitea/docker
+      dockerfile: ./gitea/docker/Dockerfile
+      image_name: gitea
+    secrets: inherit
+
+  jenkins:
+    needs: test
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    uses: danielaauriema/cloud-utils/.github/workflows/docker-publish.yml@main
+    with:
+      context: ./jenkins/docker
+      dockerfile: ./jenkins/docker/Dockerfile
+      image_name: jenkins
+    secrets: inherit
