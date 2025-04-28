@@ -2,6 +2,8 @@
 set -e
 
 . ../../commons/bash-utils.sh
+# shellcheck disable=SC1090
+. "${BASH_UTILS}"
 
 print_header "Gitea :: test gitea/ldap container"
 

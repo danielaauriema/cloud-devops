@@ -1,8 +1,11 @@
 #!/bin/bash
 set -e
 
-. .env
 . ../../commons/bash-utils.sh
+# shellcheck disable=SC1090
+. "${BASH_UTILS}"
+
+. .env
 
 JENKINS_URL="http://localhost:8080"
 
